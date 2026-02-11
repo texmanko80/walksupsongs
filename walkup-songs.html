@@ -436,7 +436,6 @@
     <script>
         // Spotify configuration
         const CLIENT_ID = 'a6c0dfee2e1f42a086bc95911a599d50'; // User will need to replace this
-        const REDIRECT_URI = window.location.origin + window.location.pathname;
         const SCOPES = 'streaming user-read-email user-read-private';
 
         let accessToken = null;
@@ -452,6 +451,13 @@
             const hash = window.location.hash.substring(1);
             const params = new URLSearchParams(hash);
             const token = params.get('access_token');
+            const error = params.get('error');
+            
+            if (error) {
+                alert('Spotify connection error: ' + error + '\n\nPlease check:\n1. Your Redirect URI in Spotify Dashboard exactly matches: ' + window.location.href.split('#')[0] + '\n2. You selected "Web Playback SDK" when creating the app\n3. Your Spotify account has Premium');
+                window.history.replaceState({}, document.title, window.location.pathname);
+                return;
+            }
             
             if (token) {
                 accessToken = token;
@@ -468,11 +474,15 @@
 
         function loginWithSpotify() {
             if (CLIENT_ID === 'YOUR_SPOTIFY_CLIENT_ID') {
-                alert('Please set up your Spotify Client ID first. See instructions in the app.');
+                alert('Setup Required:\n\n1. Go to developer.spotify.com/dashboard\n2. Create an app\n3. Copy your Client ID\n4. Edit this file on GitHub and replace YOUR_SPOTIFY_CLIENT_ID with your actual Client ID');
                 return;
             }
             
-            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&scope=${encodeURIComponent(SCOPES)}`;
+            const currentUrl = window.location.href.split('#')[0].split('?')[0];
+            console.log('Redirect URI:', currentUrl);
+            console.log('Make sure this EXACTLY matches the Redirect URI in your Spotify app settings');
+            
+            const authUrl = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${encodeURIComponent(currentUrl)}&scope=${encodeURIComponent(SCOPES)}&show_dialog=true`;
             window.location.href = authUrl;
         }
 
