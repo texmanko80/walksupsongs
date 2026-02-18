@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk-Up Songs Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #002D62 0%, #00205B 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #EB6E1F 0%, #F4911E 100%);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .baseball-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        h1 {
+            color: white;
+            margin-bottom: 8px;
+            font-size: 36px;
+            font-weight: 800;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .instructions {
+            background: white;
+            border-left: 6px solid #EB6E1F;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .instructions h3 {
+            color: #002D62;
+            margin-bottom: 12px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .instructions p {
+            color: #002D62;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        .add-player-section {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+
+        .add-player-section h2 {
+            color: #002D62;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-icon {
+            background: linear-gradient(135deg, #EB6E1F 0%, #F4911E 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #002D62;
+            font-weight: 700;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: #F9FAFB;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #EB6E1F;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(235, 110, 31, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 20px;
+            background: linear-gradient(135deg, #F9FAFB 0%, #F3F4F6 100%);
+            border: 3px dashed #CBD5E1;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            color: #64748B;
+        }
+
+        .file-input-label:hover {
+            border-color: #EB6E1F;
+            background: linear-gradient(135deg, #FFF5EB 0%, #FFE8D6 100%);
+            color: #EB6E1F;
+            transform: translateY(-2px);
+        }
+
+        .file-input-label.has-file {
+            border-color: #10B981;
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            color: #059669;
+            border-style: solid;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .time-inputs input {
+            width: 90px;
+            text-align: center;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .time-separator {
+            font-size: 28px;
+            font-weight: 800;
+            color: #002D62;
+        }
+
+        .btn-preview {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-preview:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #EB6E1F 0%, #F4911E 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(235, 110, 31, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(235, 110, 31, 0.4);
+        }
+
+        .lineup-section {
+            background: white;
+            border-radius: 16px;
+            padding: 28px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            margin-bottom: 24px;
+        }
+
+        .lineup-section h2 {
+            color: #002D62;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94A3B8;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .player-card {
+            background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
+            border: 2px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .player-card:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 12px rgba(0, 45, 98, 0.1);
+        }
+
+        .player-card.current-batter {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            border-color: #10B981;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .player-number {
+            background: linear-gradient(135deg, #002D62 0%, #00205B 100%);
+            color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 24px;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0, 45, 98, 0.3);
+        }
+
+        .player-card.current-batter .player-number {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            animation: glow 2s ease-in-out infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+            50% { box-shadow: 0 4px 24px rgba(16, 185, 129, 0.6); }
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: 800;
+            color: #002D62;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+
+        .player-song {
+            color: #64748B;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .player-timestamp {
+            color: #EB6E1F;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .player-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-play {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-play:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-play.playing {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+        }
+
+        .btn-play.playing:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-move {
+            background: linear-gradient(135deg, #64748B 0%, #475569 100%);
+            color: white;
+            border: none;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 700;
+        }
+
+        .btn-move:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(100, 116, 139, 0.4);
+        }
+
+        .btn-move:disabled {
+            background: #CBD5E1;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .now-playing {
+            background: linear-gradient(135deg, #EB6E1F 0%, #F4911E 100%);
+            color: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 8px 32px rgba(235, 110, 31, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .now-playing::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        .now-playing-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .now-playing.active {
+            display: block;
+        }
+
+        .now-playing h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-bottom: 12px;
+            opacity: 0.9;
+            font-weight: 700;
+        }
+
+        .now-playing .player-name-large {
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .now-playing .time-remaining {
+            font-size: 72px;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            margin: 24px 0;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+            background: rgba(0, 45, 98, 0.3);
+            padding: 20px;
+            border-radius: 16px;
+            display: inline-block;
+            min-width: 140px;
+        }
+
+        .now-playing .seconds-label {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            opacity: 0.9;
+            font-weight: 700;
+        }
+
+        @media (max-width: 640px) {
+            .player-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .player-actions button {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .now-playing .player-name-large {
+                font-size: 28px;
+            }
+
+            .now-playing .time-remaining {
+                font-size: 56px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="baseball-icon">⚾</div>
+                <h1>WALK-UP SONGS</h1>
+                <p class="subtitle">Little League Batting Lineup</p>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>🎵 How to Use This App</h3>
+            <p>
+                1. Add each player below with their MP3 file<br>
+                2. Set the start time for each song (where you want the 20-second clip to begin)<br>
+                3. Click "Preview" to test the timing<br>
+                4. During the game, click "Play" next to each player's name<br>
+                5. The song will play for exactly 20 seconds and stop automatically
+            </p>
+        </div>
+
+        <div class="add-player-section">
+            <h2><span class="section-icon">➕</span> Add Player to Lineup</h2>
+            <form id="addPlayerForm" onsubmit="handleAddPlayer(event)">
+                <div class="form-group">
+                    <label for="playerName">Player Name</label>
+                    <input type="text" id="playerName" placeholder="Enter player name" required>
+                </div>
+                <div class="form-group">
+                    <label for="songFile">Song MP3 File</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="songFile" accept="audio/mp3,audio/mpeg" required onchange="handleFileSelect(event)">
+                        <label for="songFile" class="file-input-label" id="fileLabel">
+                            📁 Click to select MP3 file
+                        </label>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Start Time (where to begin the 20-second clip)</label>
+                    <div class="time-inputs">
+                        <input type="number" id="startMinutes" min="0" max="9" value="0" placeholder="0">
+                        <span class="time-separator">:</span>
+                        <input type="number" id="startSeconds" min="0" max="59" value="0" placeholder="00">
+                        <button type="button" class="btn-preview" onclick="previewSong()">Preview</button>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add to Lineup</button>
+            </form>
+        </div>
+
+        <div class="now-playing" id="nowPlaying">
+            <div class="now-playing-content">
+                <h3>🎵 Now Playing</h3>
+                <div class="player-name-large" id="nowPlayingName">-</div>
+                <div class="time-remaining" id="timeRemaining">20</div>
+                <div class="seconds-label">Seconds Remaining</div>
+            </div>
+        </div>
+
+        <div class="lineup-section">
+            <h2><span class="section-icon">📋</span> Batting Order</h2>
+            <div id="lineup">
+                <div class="empty-state">
+                    <div class="empty-state-icon">⚾</div>
+                    <p>No players in the lineup yet. Add your first player above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="audioPlayer"></audio>
+    <audio id="previewPlayer"></audio>
+
+    <script>
+        let lineup = [];
+        let currentlyPlaying = null;
+        let playbackTimeout = null;
+        let countdownInterval = null;
+        let selectedFile = null;
+
+        // Load saved lineup (without audio files - those need to be re-uploaded)
+        window.onload = function() {
+            const savedLineup = localStorage.getItem('walkupLineup');
+            if (savedLineup) {
+                lineup = JSON.parse(savedLineup);
+                renderLineup();
+            }
+        };
+
+        function handleFileSelect(event) {
+            selectedFile = event.target.files[0];
+            if (selectedFile) {
+                document.getElementById('fileLabel').textContent = `✓ ${selectedFile.name}`;
+                document.getElementById('fileLabel').classList.add('has-file');
+            }
+        }
+
+        async function handleAddPlayer(event) {
+            event.preventDefault();
+            
+            const playerName = document.getElementById('playerName').value.trim();
+            const minutes = parseInt(document.getElementById('startMinutes').value) || 0;
+            const seconds = parseInt(document.getElementById('startSeconds').value) || 0;
+            
+            if (!selectedFile) {
+                alert('Please select an MP3 file');
+                return;
+            }
+
+            // Convert file to base64 for storage
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                lineup.push({
+                    name: playerName,
+                    songName: selectedFile.name,
+                    audioData: e.target.result,
+                    startTime: minutes * 60 + seconds
+                });
+
+                saveLineup();
+                renderLineup();
+
+                // Reset form
+                document.getElementById('addPlayerForm').reset();
+                document.getElementById('fileLabel').textContent = '📁 Click to select MP3 file';
+                document.getElementById('fileLabel').classList.remove('has-file');
+                selectedFile = null;
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        function previewSong() {
+            if (!selectedFile) {
+                alert('Please select an MP3 file first');
+                return;
+            }
+
+            const minutes = parseInt(document.getElementById('startMinutes').value) || 0;
+            const seconds = parseInt(document.getElementById('startSeconds').value) || 0;
+            const startTime = minutes * 60 + seconds;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewPlayer = document.getElementById('previewPlayer');
+                previewPlayer.src = e.target.result;
+                previewPlayer.currentTime = startTime;
+                previewPlayer.play();
+
+                // Stop after 20 seconds
+                setTimeout(() => {
+                    previewPlayer.pause();
+                    previewPlayer.currentTime = 0;
+                }, 20000);
+            };
+            reader.readAsDataURL(selectedFile);
+        }
+
+        function renderLineup() {
+            const lineupDiv = document.getElementById('lineup');
+            
+            if (lineup.length === 0) {
+                lineupDiv.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⚾</div><p>No players in the lineup yet. Add your first player above!</p></div>';
+                return;
+            }
+
+            lineupDiv.innerHTML = lineup.map((player, index) => {
+                const minutes = Math.floor(player.startTime / 60);
+                const seconds = player.startTime % 60;
+                const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                const isPlaying = currentlyPlaying === index;
+                const cardClass = isPlaying ? 'player-card current-batter' : 'player-card';
+                const playButtonText = isPlaying ? '⏸ Stop' : '▶ Play';
+                const playButtonClass = isPlaying ? 'btn-play playing' : 'btn-play';
+                
+                return `
+                <div class="${cardClass}">
+                    <div class="player-number">${index + 1}</div>
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-song">${player.songName}</div>
+                        <div class="player-timestamp">⏱ Start at ${timeDisplay}</div>
+                    </div>
+                    <div class="player-actions">
+                        <button class="btn-move" onclick="movePlayer(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                        <button class="btn-move" onclick="movePlayer(${index}, 1)" ${index === lineup.length - 1 ? 'disabled' : ''}>▼</button>
+                        <button class="${playButtonClass}" onclick="togglePlay(${index})">${playButtonText}</button>
+                        <button class="btn-delete" onclick="deletePlayer(${index})">🗑</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function togglePlay(index) {
+            const audioPlayer = document.getElementById('audioPlayer');
+
+            // If something is already playing, stop it
+            if (currentlyPlaying !== null) {
+                stopPlayback();
+                
+                // If clicking the same player, just stop
+                if (currentlyPlaying === index) {
+                    return;
+                }
+            }
+
+            // Start playing the new song
+            const player = lineup[index];
+            currentlyPlaying = index;
+
+            audioPlayer.src = player.audioData;
+            audioPlayer.currentTime = player.startTime;
+            audioPlayer.play();
+
+            // Show now playing display
+            document.getElementById('nowPlayingName').textContent = player.name;
+            document.getElementById('nowPlaying').classList.add('active');
+
+            // Start countdown
+            let timeLeft = 20;
+            document.getElementById('timeRemaining').textContent = timeLeft;
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('timeRemaining').textContent = timeLeft;
+
+                if (timeLeft <= 0) {
+                    stopPlayback();
+                }
+            }, 1000);
+
+            // Stop after 20 seconds
+            playbackTimeout = setTimeout(() => {
+                stopPlayback();
+            }, 20000);
+
+            renderLineup();
+        }
+
+        function stopPlayback() {
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+
+            if (playbackTimeout) {
+                clearTimeout(playbackTimeout);
+                playbackTimeout = null;
+            }
+
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+
+            document.getElementById('nowPlaying').classList.remove('active');
+            currentlyPlaying = null;
+            renderLineup();
+        }
+
+        function movePlayer(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= lineup.length) return;
+
+            const temp = lineup[index];
+            lineup[index] = lineup[newIndex];
+            lineup[newIndex] = temp;
+
+            // Adjust currently playing index
+            if (currentlyPlaying === index) {
+                currentlyPlaying = newIndex;
+            } else if (currentlyPlaying === newIndex) {
+                currentlyPlaying = index;
+            }
+
+            saveLineup();
+            renderLineup();
+        }
+
+        function deletePlayer(index) {
+            if (confirm(`Remove ${lineup[index].name} from the lineup?`)) {
+                // Stop if this player is currently playing
+                if (currentlyPlaying === index) {
+                    stopPlayback();
+                }
+
+                lineup.splice(index, 1);
+
+                // Adjust currently playing index
+                if (currentlyPlaying !== null && currentlyPlaying > index) {
+                    currentlyPlaying--;
+                }
+
+                saveLineup();
+                renderLineup();
+            }
+        }
+
+        function saveLineup() {
+            // Note: Audio data is saved as base64 in localStorage
+            // This works but can be large. For production, consider IndexedDB
+            try {
+                localStorage.setItem('walkupLineup', JSON.stringify(lineup));
+            } catch (e) {
+                console.error('Storage error - lineup may be too large:', e);
+                alert('Warning: Unable to save lineup. You may need to re-add players when you reload the page.');
+            }
+        }
+    </script>
+</body>
+</html>
