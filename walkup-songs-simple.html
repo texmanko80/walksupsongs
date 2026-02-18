@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walk-Up Songs Lineup Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .instructions {
+            background: #dbeafe;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .instructions h3 {
+            color: #1e3a8a;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .instructions p {
+            color: #1e40af;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .add-player-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .add-player-section h2 {
+            color: #1e3a8a;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            color: #475569;
+            font-weight: 500;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .time-inputs input {
+            width: 80px;
+            text-align: center;
+        }
+
+        .time-separator {
+            font-size: 24px;
+            font-weight: bold;
+            color: #64748b;
+        }
+
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+
+        .lineup-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .lineup-section h2 {
+            color: #1e3a8a;
+            margin-bottom: 16px;
+            font-size: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+        }
+
+        .player-card {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s;
+        }
+
+        .player-card.current-batter {
+            background: #dcfce7;
+            border-color: #22c55e;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+        }
+
+        .player-card.on-deck {
+            background: #fef3c7;
+            border-color: #eab308;
+        }
+
+        .player-number {
+            background: #3b82f6;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .player-card.current-batter .player-number {
+            background: #22c55e;
+        }
+
+        .player-card.on-deck .player-number {
+            background: #eab308;
+        }
+
+        .player-info {
+            flex: 1;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .player-song {
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        .player-timestamp {
+            color: #8b5cf6;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .badge {
+            background: #22c55e;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .badge.on-deck {
+            background: #eab308;
+        }
+
+        .player-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-move {
+            background: #64748b;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-move:hover {
+            background: #475569;
+        }
+
+        .btn-move:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+        }
+
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+
+        .game-controls {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .now-batting {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .now-batting h2 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+
+        .now-batting .player-name-large {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .now-batting .song-info-large {
+            font-size: 18px;
+            margin-bottom: 4px;
+            opacity: 0.95;
+        }
+
+        .now-batting .timestamp-large {
+            font-size: 24px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .timer-display {
+            background: #1e293b;
+            color: white;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .timer-display.active {
+            display: block;
+        }
+
+        .timer-display .timer-value {
+            font-size: 48px;
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timer-display .timer-label {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 8px;
+            opacity: 0.8;
+        }
+
+        .btn-large {
+            width: 100%;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-play-song {
+            background: #22c55e;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .btn-play-song:hover {
+            background: #16a34a;
+            transform: scale(1.02);
+        }
+
+        .btn-next-batter {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .btn-next-batter:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        .btn-stop {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-stop:hover {
+            background: #dc2626;
+        }
+
+        .on-deck-display {
+            background: #fef3c7;
+            border: 2px solid #eab308;
+            border-radius: 8px;
+            padding: 12px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .on-deck-display h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #92400e;
+            margin-bottom: 4px;
+        }
+
+        .on-deck-display .player-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #92400e;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 640px) {
+            .player-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚾ Walk-Up Songs</h1>
+            <p class="subtitle">Little League Batting Lineup Manager</p>
+        </div>
+
+        <div class="instructions">
+            <h3>📱 How to Use:</h3>
+            <p>
+                1. Add players and their walk-up songs below<br>
+                2. Open your music app (Spotify, Apple Music, etc.) and create a playlist<br>
+                3. During the game, click "▶ PLAY SONG" - then manually play the song in your music app<br>
+                4. The app will count down 20 seconds and alert you when to stop<br>
+                5. Click "NEXT BATTER" to move to the next player
+            </p>
+        </div>
+
+        <div class="add-player-section">
+            <h2>Add Player to Lineup</h2>
+            <form id="addPlayerForm" onsubmit="handleAddPlayer(event)">
+                <div class="form-group">
+                    <label for="playerName">Player Name</label>
+                    <input type="text" id="playerName" placeholder="Enter player name" required>
+                </div>
+                <div class="form-group">
+                    <label for="songName">Song Name</label>
+                    <input type="text" id="songName" placeholder="Enter song title" required>
+                </div>
+                <div class="form-group">
+                    <label for="artistName">Artist</label>
+                    <input type="text" id="artistName" placeholder="Enter artist name" required>
+                </div>
+                <div class="form-group">
+                    <label>Start Time (where to begin the 20-second clip)</label>
+                    <div class="time-inputs">
+                        <input type="number" id="startMinutes" min="0" max="9" value="0" placeholder="0">
+                        <span class="time-separator">:</span>
+                        <input type="number" id="startSeconds" min="0" max="59" value="0" placeholder="00">
+                        <span style="color: #64748b; font-size: 14px; margin-left: 8px;">(e.g., 1:30 for 1 min 30 sec)</span>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary">Add to Lineup</button>
+            </form>
+        </div>
+
+        <div class="game-controls" id="gameControls" style="display: none;">
+            <div class="now-batting" id="nowBatting">
+                <h2>Now Batting</h2>
+                <div class="player-name-large" id="currentPlayerName">-</div>
+                <div class="song-info-large" id="currentSongInfo">-</div>
+                <div class="timestamp-large" id="currentTimestamp">Start at 0:00</div>
+            </div>
+
+            <div class="timer-display" id="timerDisplay">
+                <div class="timer-value" id="timerValue">20</div>
+                <div class="timer-label">Seconds Remaining</div>
+            </div>
+
+            <button class="btn-large btn-play-song" id="playSongBtn" onclick="startTimer()">
+                ▶ PLAY SONG NOW
+            </button>
+            <button class="btn-large btn-stop hidden" id="stopBtn" onclick="stopTimer()">
+                ⏹ STOP
+            </button>
+            <button class="btn-large btn-next-batter" onclick="nextBatter()">
+                NEXT BATTER ➡
+            </button>
+
+            <div class="on-deck-display" id="onDeckDisplay" style="display: none;">
+                <h3>On Deck</h3>
+                <div class="player-name" id="onDeckName">-</div>
+            </div>
+        </div>
+
+        <div class="lineup-section">
+            <h2>Batting Order</h2>
+            <div id="lineup">
+                <div class="empty-state">
+                    <p>No players in the lineup yet. Add your first player above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let lineup = [];
+        let currentBatterIndex = 0;
+        let timerInterval = null;
+        let timeRemaining = 20;
+
+        // Load saved lineup on page load
+        window.onload = function() {
+            const savedLineup = localStorage.getItem('walkupLineup');
+            if (savedLineup) {
+                lineup = JSON.parse(savedLineup);
+                renderLineup();
+                if (lineup.length > 0) {
+                    showGameControls();
+                }
+            }
+        };
+
+        function handleAddPlayer(event) {
+            event.preventDefault();
+            
+            const playerName = document.getElementById('playerName').value.trim();
+            const songName = document.getElementById('songName').value.trim();
+            const artistName = document.getElementById('artistName').value.trim();
+            const minutes = parseInt(document.getElementById('startMinutes').value) || 0;
+            const seconds = parseInt(document.getElementById('startSeconds').value) || 0;
+            
+            lineup.push({
+                name: playerName,
+                song: songName,
+                artist: artistName,
+                startTime: minutes * 60 + seconds
+            });
+
+            saveLineup();
+            renderLineup();
+            showGameControls();
+
+            // Reset form
+            document.getElementById('addPlayerForm').reset();
+        }
+
+        function renderLineup() {
+            const lineupDiv = document.getElementById('lineup');
+            
+            if (lineup.length === 0) {
+                lineupDiv.innerHTML = '<div class="empty-state"><p>No players in the lineup yet. Add your first player above!</p></div>';
+                return;
+            }
+
+            lineupDiv.innerHTML = lineup.map((player, index) => {
+                const minutes = Math.floor(player.startTime / 60);
+                const seconds = player.startTime % 60;
+                const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                
+                let cardClass = 'player-card';
+                let badge = '';
+                
+                if (index === currentBatterIndex) {
+                    cardClass += ' current-batter';
+                    badge = '<span class="badge">AT BAT</span>';
+                } else if (index === currentBatterIndex + 1) {
+                    cardClass += ' on-deck';
+                    badge = '<span class="badge on-deck">On Deck</span>';
+                }
+                
+                return `
+                <div class="${cardClass}">
+                    <div class="player-number">${index + 1}</div>
+                    <div class="player-info">
+                        <div class="player-name">${player.name}</div>
+                        <div class="player-song">${player.song} - ${player.artist}</div>
+                        <div class="player-timestamp">⏱ Start at ${timeDisplay}</div>
+                    </div>
+                    ${badge}
+                    <div class="player-actions">
+                        <button class="btn-move" onclick="movePlayer(${index}, -1)" ${index === 0 ? 'disabled' : ''}>▲</button>
+                        <button class="btn-move" onclick="movePlayer(${index}, 1)" ${index === lineup.length - 1 ? 'disabled' : ''}>▼</button>
+                        <button class="btn-delete" onclick="deletePlayer(${index})">🗑</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function showGameControls() {
+            document.getElementById('gameControls').style.display = 'block';
+            updateCurrentBatter();
+        }
+
+        function updateCurrentBatter() {
+            if (lineup.length === 0) return;
+
+            const currentPlayer = lineup[currentBatterIndex];
+            const minutes = Math.floor(currentPlayer.startTime / 60);
+            const seconds = currentPlayer.startTime % 60;
+            const timeDisplay = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            document.getElementById('currentPlayerName').textContent = currentPlayer.name;
+            document.getElementById('currentSongInfo').textContent = `${currentPlayer.song} - ${currentPlayer.artist}`;
+            document.getElementById('currentTimestamp').textContent = `Start at ${timeDisplay}`;
+
+            // Show on-deck batter
+            if (currentBatterIndex + 1 < lineup.length) {
+                const onDeckPlayer = lineup[currentBatterIndex + 1];
+                document.getElementById('onDeckName').textContent = onDeckPlayer.name;
+                document.getElementById('onDeckDisplay').style.display = 'block';
+            } else {
+                document.getElementById('onDeckDisplay').style.display = 'none';
+            }
+
+            renderLineup();
+        }
+
+        function startTimer() {
+            if (timerInterval) return;
+
+            timeRemaining = 20;
+            document.getElementById('timerDisplay').classList.add('active');
+            document.getElementById('playSongBtn').classList.add('hidden');
+            document.getElementById('stopBtn').classList.remove('hidden');
+            document.getElementById('timerValue').textContent = timeRemaining;
+
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                document.getElementById('timerValue').textContent = timeRemaining;
+
+                if (timeRemaining <= 0) {
+                    stopTimer();
+                    alert('⏰ Time\'s up! Stop the music.');
+                }
+            }, 1000);
+        }
+
+        function stopTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+            
+            document.getElementById('timerDisplay').classList.remove('active');
+            document.getElementById('playSongBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            timeRemaining = 20;
+        }
+
+        function nextBatter() {
+            stopTimer();
+            
+            if (currentBatterIndex < lineup.length - 1) {
+                currentBatterIndex++;
+            } else {
+                // Loop back to the beginning
+                if (confirm('End of lineup! Start over from the top?')) {
+                    currentBatterIndex = 0;
+                } else {
+                    return;
+                }
+            }
+            
+            updateCurrentBatter();
+        }
+
+        function movePlayer(index, direction) {
+            const newIndex = index + direction;
+            if (newIndex < 0 || newIndex >= lineup.length) return;
+
+            // Swap players
+            const temp = lineup[index];
+            lineup[index] = lineup[newIndex];
+            lineup[newIndex] = temp;
+
+            // Adjust current batter index if needed
+            if (index === currentBatterIndex) {
+                currentBatterIndex = newIndex;
+            } else if (newIndex === currentBatterIndex) {
+                currentBatterIndex = index;
+            }
+
+            saveLineup();
+            renderLineup();
+            updateCurrentBatter();
+        }
+
+        function deletePlayer(index) {
+            if (confirm(`Remove ${lineup[index].name} from the lineup?`)) {
+                lineup.splice(index, 1);
+                
+                // Adjust current batter index
+                if (currentBatterIndex >= lineup.length) {
+                    currentBatterIndex = Math.max(0, lineup.length - 1);
+                }
+                
+                saveLineup();
+                renderLineup();
+                
+                if (lineup.length === 0) {
+                    document.getElementById('gameControls').style.display = 'none';
+                } else {
+                    updateCurrentBatter();
+                }
+            }
+        }
+
+        function saveLineup() {
+            localStorage.setItem('walkupLineup', JSON.stringify(lineup));
+        }
+    </script>
+</body>
+</html>
